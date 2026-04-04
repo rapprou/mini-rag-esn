@@ -475,9 +475,15 @@
           </div>
           <div class="doc-meta">${formatDate(doc.created_at)}</div>
         </div>
-        <button class="btn btn-danger" onclick="deleteDocument(${doc.id}, this)">Delete</button>
+        <button class="btn btn-danger" data-id="${doc.id}">Delete</button>
       </div>
     `).join('');
+
+    list.querySelectorAll('.btn-danger').forEach(btn => {
+      btn.addEventListener('click', () => {
+        deleteDocument(btn.dataset.id, btn);
+      });
+    });
   }
 
   async function deleteDocument(id, btn) {
@@ -485,10 +491,7 @@
     try {
       const res = await fetch(`${API}/documents/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
-      btn.closest('.doc-card').remove();
-      if (!qs('#docsList .doc-card')) {
-        qs('#docsList').innerHTML = '<div class="empty-state">No documents yet.</div>';
-      }
+      loadDocuments();
     } catch {
       btn.disabled = false;
       alert('Failed to delete document.');
