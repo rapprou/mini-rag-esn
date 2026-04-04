@@ -8,18 +8,22 @@ router = APIRouter()
 
 @router.get("", response_model=list[DocumentOut])
 def list_documents():
-    response = (
-        get_supabase()
-        .table("documents")
-        .select("id, title, filename, created_at, chunk_count")
-        .order("created_at", desc=True)
-        .execute()
-    )
-    return response.data or []
+    try:
+        response = (
+            get_supabase()
+            .table("documents")
+            .select("id, title, filename, created_at")
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return response.data or []
+    except Exception as e:
+        print(f"[ERROR] list_documents failed: {e}")
+        return []
 
 
 @router.delete("/{document_id}", response_model=DeleteResponse)
-def delete_document(document_id: int):
+def delete_document(document_id: str):
     supabase = get_supabase()
 
     chunks_response = (

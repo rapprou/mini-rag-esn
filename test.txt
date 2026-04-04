@@ -1,0 +1,5 @@
+Nom commercial : Ma Super Entreprise
+Adresse : 10 rue de la Paix, 75001 Paris
+SIREN : 123 456 789
+Gérant : Juan Roussille
+Activité : Conseil en informatique
