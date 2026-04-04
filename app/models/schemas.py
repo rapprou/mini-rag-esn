@@ -8,7 +8,7 @@ class AskRequest(BaseModel):
 
 
 class ChunkSource(BaseModel):
-    document_id: int
+    document_id: str
     document_title: str
     content_excerpt: str
     similarity: float
@@ -22,15 +22,15 @@ class AskResponse(BaseModel):
 
 
 class DocumentOut(BaseModel):
-    id: int
+    id: str
     title: str
     filename: str
     created_at: datetime
-    chunk_count: int
+    chunk_count: int = 0
 
 
 class UploadResponse(BaseModel):
-    document_id: int
+    document_id: str
     title: str
     filename: str
     chunk_count: int
@@ -38,6 +38,6 @@ class UploadResponse(BaseModel):
 
 
 class DeleteResponse(BaseModel):
-    document_id: int
+    document_id: str
     deleted_chunks: int
     message: str

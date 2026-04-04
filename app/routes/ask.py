@@ -12,6 +12,7 @@ router = APIRouter()
 def ask(request: AskRequest):
     query_embedding = embed_text(request.question)
     chunks = retrieve_chunks(query_embedding, request.top_k)
+    print(f"[DEBUG] retrieve_chunks returned {len(chunks)} chunk(s): {chunks}")
     chunks = enrich_with_document_titles(chunks)
 
     answer = generate_answer(request.question, chunks)
@@ -21,7 +22,7 @@ def ask(request: AskRequest):
             document_id=chunk["document_id"],
             document_title=chunk["document_title"],
             content_excerpt=chunk["content"][:200],
-            similarity=chunk["similarity"],
+            similarity=chunk.get("similarity", 0.0),
         )
         for chunk in chunks
     ]

@@ -44,8 +44,9 @@ async def upload_document(
             "document_id": document_id,
             "content": chunk,
             "embedding": embedding,
+            "chunk_index": i,
         }
-        for chunk, embedding in zip(chunks, embeddings)
+        for i, (chunk, embedding) in enumerate(zip(chunks, embeddings))
     ]
     supabase.table("chunks").insert(chunk_rows).execute()
 

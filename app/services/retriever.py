@@ -1,12 +1,46 @@
+import os
+import psycopg2
+import psycopg2.extras
 from app.db.supabase import get_supabase
 
 
 def retrieve_chunks(query_embedding: list[float], top_k: int) -> list[dict]:
-    response = get_supabase().rpc(
-        "match_chunks",
-        {"query_embedding": query_embedding, "match_count": top_k},
-    ).execute()
-    return response.data or []
+    embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
+
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        try:
+            conn = psycopg2.connect(database_url)
+            try:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                    cur.execute("SELECT COUNT(*) FROM chunks")
+                    cur.fetchone()
+
+                    sql = f"""
+                        SELECT id, content, document_id,
+                               1 - (embedding <=> '{embedding_str}'::vector) AS similarity
+                        FROM chunks
+                        ORDER BY embedding <=> '{embedding_str}'::vector
+                        LIMIT {top_k}
+                    """
+                    cur.execute(sql)
+                    rows = cur.fetchall()
+            finally:
+                conn.close()
+            return [dict(row) for row in rows]
+        except Exception as e:
+            print(f"[ERROR] psycopg2 query failed: {e} — falling back to Supabase table query")
+
+    fallback = (
+        get_supabase()
+        .table("chunks")
+        .select("id, document_id, content")
+        .limit(top_k)
+        .execute()
+    )
+    for chunk in fallback.data or []:
+        chunk["similarity"] = 0.0
+    return fallback.data or []
 
 
 def enrich_with_document_titles(chunks: list[dict]) -> list[dict]:
