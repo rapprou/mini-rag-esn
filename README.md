@@ -48,3 +48,12 @@ Interface disponible sur [http://localhost:8000](http://localhost:8000).
 - **Recherche sémantique** — chaque document est découpé en chunks et converti en vecteurs d'embedding (OpenAI `text-embedding-3-small`), permettant une recherche par similarité cosinus bien plus pertinente qu'une recherche par mots-clés.
 - **Génération ancrée** — seuls les chunks les plus proches de la question sont transmis à Claude comme contexte, ce qui réduit les hallucinations et limite les coûts d'inférence.
 - **Stack production-ready** — FastAPI pour les performances async, Supabase (PostgreSQL + pgvector) pour la persistance vectorielle, architecture en couches (routes / services / db) directement déployable.
+
+---
+
+## Roadmap
+
+- [ ] Support des formats Word (`.docx`) et Excel (`.xlsx`)
+- [ ] OCR pour les PDFs scannés
+- [ ] Authentification utilisateur
+- [ ] Déploiement sur Railway / Render
