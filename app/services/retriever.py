@@ -5,31 +5,32 @@ from app.db.supabase import get_supabase
 
 
 def retrieve_chunks(query_embedding: list[float], top_k: int) -> list[dict]:
-    embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
+    embedding_str = "[" + ",".join(f"{x:.6f}" for x in query_embedding) + "]"
 
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
+        conn = None
         try:
             conn = psycopg2.connect(database_url)
-            try:
-                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                    cur.execute("SELECT COUNT(*) FROM chunks")
-                    cur.fetchone()
-
-                    sql = f"""
-                        SELECT id, content, document_id,
-                               1 - (embedding <=> '{embedding_str}'::vector) AS similarity
-                        FROM chunks
-                        ORDER BY embedding <=> '{embedding_str}'::vector
-                        LIMIT {top_k}
-                    """
-                    cur.execute(sql)
-                    rows = cur.fetchall()
-            finally:
-                conn.close()
+            cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cur.execute(
+                """
+                SELECT id, content, document_id,
+                       1 - (embedding <=> %s::vector) AS similarity
+                FROM chunks
+                ORDER BY embedding <=> %s::vector
+                LIMIT %s
+                """,
+                (embedding_str, embedding_str, top_k),
+            )
+            rows = cur.fetchall()
+            cur.close()
+            conn.close()
             return [dict(row) for row in rows]
         except Exception as e:
-            print(f"[ERROR] psycopg2 query failed: {e} — falling back to Supabase table query")
+            print(f"[ERROR] psycopg2 failed: {e}")
+            if conn:
+                conn.close()
 
     fallback = (
         get_supabase()
