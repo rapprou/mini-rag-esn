@@ -12,7 +12,6 @@ router = APIRouter()
 def ask(request: AskRequest):
     query_embedding = embed_text(request.question)
     chunks = retrieve_chunks(query_embedding, request.top_k)
-    print(f"[DEBUG] retrieve_chunks returned {len(chunks)} chunk(s): {chunks}")
     chunks = enrich_with_document_titles(chunks)
 
     answer = generate_answer(request.question, chunks)
