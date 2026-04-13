@@ -611,6 +611,7 @@
         <div class="upload-icon">📄</div>
         <p><strong>Glisser-déposer</strong> ou cliquer pour parcourir</p>
         <p style="margin-top:3px">PDF, TXT, MD acceptés</p>
+        <p style="margin-top:3px">Max 10 MB</p>
         <input type="file" id="fileInput" accept=".pdf,.txt,.md" />
         <input type="text" id="titleInput" placeholder="Titre personnalisé (optionnel)" />
         <div class="upload-btn-row">
@@ -686,6 +687,38 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/\n/g, '<br>');
+  }
+
+  function renderMarkdown(str) {
+    const escaped = String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+    const lines = escaped.split('\n');
+    const output = [];
+    let inList = false;
+
+    for (const line of lines) {
+      const listMatch = line.match(/^- (.+)/);
+      if (listMatch) {
+        if (!inList) { output.push('<ul>'); inList = true; }
+        output.push(`<li>${applyInline(listMatch[1])}</li>`);
+      } else {
+        if (inList) { output.push('</ul>'); inList = false; }
+        output.push(line === '' ? '<br>' : `<span>${applyInline(line)}</span><br>`);
+      }
+    }
+    if (inList) output.push('</ul>');
+
+    return output.join('');
+  }
+
+  function applyInline(str) {
+    return str
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
   }
 
   function formatDate(iso) {
@@ -992,7 +1025,7 @@
       : '';
 
     el.innerHTML = `
-      <div class="msg-bubble">${escapeHtml(data.answer)}</div>
+      <div class="msg-bubble">${renderMarkdown(data.answer)}</div>
       ${sourcesHtml}
       ${time ? `<div class="msg-meta">${time}</div>` : ''}
     `;
