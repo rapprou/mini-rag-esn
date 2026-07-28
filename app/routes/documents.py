@@ -12,7 +12,7 @@ def list_documents():
         response = (
             get_supabase()
             .table("documents")
-            .select("id, title, filename, created_at")
+            .select("id, title, filename, created_at, chunk_count")
             .order("created_at", desc=True)
             .execute()
         )

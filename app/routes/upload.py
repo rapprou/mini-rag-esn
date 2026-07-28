@@ -49,6 +49,7 @@ async def upload_document(
         for i, (chunk, embedding) in enumerate(zip(chunks, embeddings))
     ]
     supabase.table("chunks").insert(chunk_rows).execute()
+    supabase.table("documents").update({"chunk_count": len(chunks)}).eq("id", document_id).execute()
 
     return UploadResponse(
         document_id=document_id,

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Mini RAG-ESN is a Retrieval-Augmented Generation (RAG) system built with FastAPI, Supabase (PostgreSQL + pgvector), OpenAI embeddings, and Claude for answer generation. The UI is a French-language Vue.js SPA.
+Mini RAG-ESN is a Retrieval-Augmented Generation (RAG) system built with FastAPI, Supabase (PostgreSQL + pgvector), OpenAI embeddings, and Claude for answer generation. The UI is a French-language vanilla JS SPA (no framework).
 
 ## Development Commands
 
