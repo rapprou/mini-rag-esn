@@ -115,3 +115,4 @@ frontend/        # SPA vanilla JS (dark/light, historique, sources)
 - [ ] OCR pour les PDFs scannés
 - [ ] Authentification utilisateur
 - [ ] Déploiement sur Railway / Render
+
